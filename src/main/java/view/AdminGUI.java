@@ -179,6 +179,11 @@ public class AdminGUI {
         createButton.addActionListener(e);
     }
 
+    public void addReportsGenerator(ActionListener e)
+    {
+        reportButton.addActionListener(e);
+    }
+
     public String getTitle()
     {
         return titleText.getText();
@@ -207,6 +212,12 @@ public class AdminGUI {
     {
         return priceText.getText();
     }
+    public String getStartTime() {return startTimeText.getText();}
+    public String getStopTime() { return stopTimeText.getText(); }
+    public String getMinOrderedProduct() { return productOrderedMoreText.getText();}
+    public String getMinOrdersClient() {return clientWithOrdersText.getText();}
+    public String getMinPriceOrderClient() {return clientWithOrdersHigherText.getText();}
+    public String getProductOrderedDay() {return productOrderOnText.getText();}
 
     public void setTable(JTable table)
     {

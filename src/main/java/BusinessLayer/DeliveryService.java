@@ -18,7 +18,14 @@ public class DeliveryService implements IDeliveryServiceProcessing{
     private ArrayList<Admin> admins = new ArrayList<Admin>();
     private ArrayList<Worker> workers = new ArrayList<Worker>();
     private ArrayList<Client> clients = new ArrayList<Client>();
+    private ArrayList<MenuItem> itemsInOrder = new ArrayList<>();
     private int nrProducts;
+    private int nrClients;
+    private int nrWorkers;
+    private int nrAdmins;
+    private int nrOrders;
+    private int activeClient;
+    private Order order;
     private Set<String> set = new HashSet<>();
 
 
@@ -104,13 +111,91 @@ public class DeliveryService implements IDeliveryServiceProcessing{
     }
 
     @Override
-    public boolean createCompositeProduct(ArrayList<BaseProduct> e, String title) {
-        CompositeProduct compositeProduct = new CompositeProduct(title);
+    public void createCompositeProduct(ArrayList<BaseProduct> e, String title) {
+        CompositeProduct compositeProduct = new CompositeProduct(title,++nrProducts);
         for(BaseProduct i : e)
             compositeProduct.add(i);
         menuItems.add(compositeProduct);
+    }
 
-        return true;
+    @Override
+    public List<Order> generateTimeReport(int startTime, int stopTime) {
+        Map<Order,ArrayList<MenuItem>> result = orders.entrySet().stream().filter(map -> map.getKey().getDate().getHours() >= startTime).filter(map -> map.getKey().getDate().getHours() <= stopTime).collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
+        List<Order> listResult = new ArrayList<>(result.keySet());
+        return listResult;
+    }
+
+    @Override
+    public List<MenuItem> generateProductOrderedMoreReport(int minimum) {
+        return menuItems.stream().filter(product -> product.getTimesOrdered() >= minimum).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Client> generateClientWithMinOrders(int minimumOrders, int minimumValue) {
+        List<Client> result = clients.stream().filter(client -> client.getNrOrders() >= minimumOrders).collect(Collectors.toList());
+
+        List<Client> finalResult = new ArrayList<>();
+        for(Client i : result) {
+            Map<Order, ArrayList<MenuItem>> orderResult = orders.entrySet().stream().filter(map -> map.getKey().getClientID() == i.getId()).filter(map -> map.getKey().getTotal() >= minimumValue).collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
+            if(orderResult.size()>0)
+                finalResult.add(i);
+        }
+        finalResult = finalResult.stream().distinct().collect(Collectors.toList());
+        return finalResult;
+    }
+
+    @Override
+    public List<MenuItem> generateProductsWithinASpecifiedDay(int day) {
+        Map<Order,ArrayList<MenuItem>> result = orders.entrySet().stream().filter(map -> map.getKey().getDate().getDay() == day).collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
+        List<MenuItem> finalResult = new ArrayList<>();
+        for(Order i : result.keySet())
+            finalResult.addAll(result.get(i));
+        finalResult = finalResult.stream().distinct().collect(Collectors.toList());
+        return finalResult;
+    }
+
+    @Override
+    public void addOrder() {
+        ArrayList<MenuItem> finalItemsInOrder = new ArrayList<>(itemsInOrder);
+        for(MenuItem i : itemsInOrder) {
+            i.setTimesOrdered(i.getTimesOrdered() + 1);
+            order.setTotal(order.getTotal()+i.getPrice());
+        }
+        orders.put(order,finalItemsInOrder);
+        itemsInOrder.clear();
+
+        clients.get(order.getClientID()-1).setNrOrders(clients.get(order.getClientID()-1).getNrOrders()+1);
+        new Bill(finalItemsInOrder,order);
+    }
+
+    @Override
+    public List<MenuItem> searchItemByClient(String title, float rating, int fat, int protein, int calories,int sodium, int price) {
+
+        List<MenuItem> searchedProducts ;
+        if(title.equals(""))
+            searchedProducts = menuItems.stream().filter(product -> product.getRating() >= rating).filter(product -> product.getCalories() <= calories).filter(product -> product.getFat() <= fat).filter(product -> product.getSodium() <= sodium).filter(product -> product.getProtein() >= protein).filter(product -> product.getPrice() <= price).collect(Collectors.toList());
+        else
+            searchedProducts = menuItems.stream().filter(product -> product.getTitle().contains(title)).filter(product -> product.getRating() >= rating).filter(product -> product.getCalories() <= calories).filter(product -> product.getFat() <= fat).filter(product -> product.getSodium() <= sodium).filter(product -> product.getProtein() >= protein).filter(product -> product.getPrice() <= price).collect(Collectors.toList());
+        return searchedProducts;
+    }
+
+    public void addToOrder(String title)
+    {
+        if(itemsInOrder.size()==0)
+            order = new Order(++nrOrders,activeClient,Calendar.getInstance().getTime());
+        for(MenuItem i : menuItems)
+        {
+            if(i.getTitle().equals(title))
+                itemsInOrder.add(i);
+        }
+    }
+
+    public int getPrice(String title)
+    {
+        for(MenuItem i :menuItems)
+            if(i.getTitle().equals(title))
+                return i.computePrice();
+        return 0;
     }
 
     public boolean verifyLogIn(String role, String username, String password)
@@ -134,7 +219,10 @@ public class DeliveryService implements IDeliveryServiceProcessing{
             }
             for(Client i: clients)
                 if(i.getUsername().equals(username) && i.getPassword().equals(password))
+                {
+                    activeClient = clients.indexOf(i)+1;
                     return true;
+                }
         }
         return false;
     }
@@ -150,19 +238,19 @@ public class DeliveryService implements IDeliveryServiceProcessing{
                 String[] res = line.split(",",0);
                 if(res[2].equals("admin"))
                 {
-                    Admin admin = new Admin(res[0],res[1]);
+                    Admin admin = new Admin(++nrAdmins,res[0],res[1]);
                     admins.add(admin);
                 }
                 else
                 {
                     if(res[2].equals("client"))
                     {
-                        Client client = new Client(res[0],res[1]);
+                        Client client = new Client(++nrClients,res[0],res[1]);
                         clients.add(client);
                     }
                     else
                     {
-                        Worker worker = new Worker(res[0],res[1]);
+                        Worker worker = new Worker(++nrWorkers,res[0],res[1]);
                         workers.add(worker);
                     }
                 }

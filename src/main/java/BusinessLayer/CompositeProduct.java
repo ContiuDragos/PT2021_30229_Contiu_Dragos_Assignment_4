@@ -8,10 +8,12 @@ public class CompositeProduct implements MenuItem {
     ArrayList<BaseProduct> products = new ArrayList<>();
     private String title;
     private int id;
+    private int timesOrdered;
 
-    public CompositeProduct(String title)
+    public CompositeProduct(String title, int id)
     {
         this.title=title;
+        this.id=id;
     }
 
     @Override
@@ -46,6 +48,14 @@ public class CompositeProduct implements MenuItem {
     {
         products.add(menuItem);
         title += " "+menuItem.getTitle();
+    }
+
+    public int getTimesOrdered() {
+        return timesOrdered;
+    }
+
+    public void setTimesOrdered(int timesOrdered) {
+        this.timesOrdered = timesOrdered;
     }
 
     public float getRating()

@@ -1,7 +1,7 @@
 package Model;
 
 public class Worker extends User{
-    public Worker(String username, String password) {
-        super(username, password);
+    public Worker(int id,String username, String password) {
+        super(id,username, password);
     }
 }

@@ -1,6 +1,9 @@
 package BusinessLayer;
 
+import Model.Client;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public interface IDeliveryServiceProcessing {
 
@@ -12,6 +15,18 @@ public interface IDeliveryServiceProcessing {
 
     boolean modifyProduct(String title, float rating, int calories, int protein, int fat, int sodium, int price);
 
-    boolean createCompositeProduct(ArrayList<BaseProduct> e, String title);
+    void createCompositeProduct(ArrayList<BaseProduct> e, String title);
+
+    List<Order> generateTimeReport(int startTime, int stopTime);
+
+    List<MenuItem> generateProductOrderedMoreReport(int minimum);
+
+    List<Client> generateClientWithMinOrders(int minimumOrders, int minimumValue);
+
+    List<MenuItem> generateProductsWithinASpecifiedDay(int day);
+
+    void addOrder();
+
+    List<MenuItem> searchItemByClient(String title, float rating, int fat, int protein, int calories, int sodium, int price);
 
 }

@@ -2,8 +2,17 @@ package Model;
 
 public class Client extends User{
 
-    public Client(String username, String password)
+    private int nrOrders;
+    public Client(int id,String username, String password)
     {
-        super(username,password);
+        super(id,username,password);
+    }
+
+    public int getNrOrders() {
+        return nrOrders;
+    }
+
+    public void setNrOrders(int nrOrders) {
+        this.nrOrders = nrOrders;
     }
 }

@@ -9,6 +9,7 @@ public class BaseProduct implements MenuItem{
     private int fat;
     private int sodium;
     private int price;
+    private int timesOrdered;
 
     public BaseProduct(int id, String title, float rating, int calories, int protein, int fat, int sodium, int price)
     {
@@ -54,6 +55,11 @@ public class BaseProduct implements MenuItem{
         this.price = price;
     }
 
+
+    public void setTimesOrdered(int timesOrdered) {
+        this.timesOrdered = timesOrdered;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -84,5 +90,9 @@ public class BaseProduct implements MenuItem{
 
     public int getPrice() {
         return price;
+    }
+
+    public int getTimesOrdered() {
+        return timesOrdered;
     }
 }
