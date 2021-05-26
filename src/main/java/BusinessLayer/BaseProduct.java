@@ -1,16 +1,18 @@
 package BusinessLayer;
 
 public class BaseProduct implements MenuItem{
+    private int id;
     private final String title;
-    private final float rating;
-    private final int calories;
-    private final int protein;
-    private final int fat;
-    private final int sodium;
-    private final int price;
+    private float rating;
+    private int calories;
+    private int protein;
+    private int fat;
+    private int sodium;
+    private int price;
 
-    public BaseProduct(String title, float rating, int calories, int protein, int fat, int sodium, int price)
+    public BaseProduct(int id, String title, float rating, int calories, int protein, int fat, int sodium, int price)
     {
+        this.id=id;
         this.title=title;
         this.rating=rating;
         this.calories=calories;
@@ -22,6 +24,38 @@ public class BaseProduct implements MenuItem{
     @Override
     public int computePrice() {
         return price;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
+
+    public void setProtein(int protein) {
+        this.protein = protein;
+    }
+
+    public void setFat(int fat) {
+        this.fat = fat;
+    }
+
+    public void setSodium(int sodium) {
+        this.sodium = sodium;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {

@@ -7,8 +7,9 @@ import Model.Worker;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DeliveryService implements IDeliveryServiceProcessing{
 
@@ -17,18 +18,26 @@ public class DeliveryService implements IDeliveryServiceProcessing{
     private ArrayList<Admin> admins = new ArrayList<Admin>();
     private ArrayList<Worker> workers = new ArrayList<Worker>();
     private ArrayList<Client> clients = new ArrayList<Client>();
+    private int nrProducts;
+    private Set<String> set = new HashSet<>();
+
 
     @Override
     public void importProducts() {
         var filePath = System.getProperty("user.dir")+"/src/main/resources/products.csv";
         try (BufferedReader br = new BufferedReader(new FileReader(filePath)))
         {
-            String line = br.readLine();
-            while((line = br.readLine()) != null)
+            List<String> lines;
+            lines = br.lines().skip(1).collect(Collectors.toList());
+            lines = lines.stream().distinct().collect(Collectors.toList());
+
+            for(String i : lines)
             {
-                String[] res = line.split(",",0);
-                MenuItem product = new BaseProduct(res[0],Float.parseFloat(res[1]),Integer.parseInt(res[2]),Integer.parseInt(res[3]),Integer.parseInt(res[4]),Integer.parseInt(res[5]),Integer.parseInt(res[6]));
-                menuItems.add(product);
+                String[] res = i.split(",",0);
+                if(set.add(res[0])) {
+                    MenuItem product = new BaseProduct(++nrProducts, res[0], Float.parseFloat(res[1]), Integer.parseInt(res[2]), Integer.parseInt(res[3]), Integer.parseInt(res[4]), Integer.parseInt(res[5]), Integer.parseInt(res[6]));
+                    menuItems.add(product);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,24 +45,72 @@ public class DeliveryService implements IDeliveryServiceProcessing{
     }
 
     @Override
-    public void addProduct() {
-
-
+    public boolean addProduct(String title, float rating, int calories, int protein, int fat, int sodium, int price) {
+        if(set.add(title))
+        {
+            menuItems.add(new BaseProduct(++nrProducts,title,rating,calories,protein,fat,sodium,price));
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public void deleteProduct() {
-
+    public boolean deleteProduct(String title) {
+        if(!set.contains(title)) {
+            return false;
+        }
+        set.remove(title);
+        boolean removed = false;
+        for(int i=0; i<menuItems.size(); i++)
+        {
+            if(menuItems.get(i) instanceof BaseProduct)
+            {
+                if(removed)
+                    ((BaseProduct) menuItems.get(i)).setId(((BaseProduct) menuItems.get(i)).getId()-1);
+                if(((BaseProduct) menuItems.get(i)).getTitle().equals(title))
+                {
+                    menuItems.remove(i);
+                    i--;
+                    nrProducts--;
+                    removed = true;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
-    public void modifyProduct() {
+    public boolean modifyProduct(String title, float rating, int calories, int protein, int fat, int sodium, int price) {
 
+        if(!set.contains(title))
+            return false;
+        for(MenuItem i : menuItems)
+        {
+            if(i instanceof BaseProduct)
+            {
+                if( i.getTitle().equals(title))
+                {
+                    ((BaseProduct) i).setRating(rating);
+                    ((BaseProduct) i).setCalories(calories);
+                    ((BaseProduct) i).setPrice(protein);
+                    ((BaseProduct) i).setFat(fat);
+                    ((BaseProduct) i).setSodium(sodium);
+                    ((BaseProduct) i).setPrice(price);
+                    break;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
-    public void generateReport() {
+    public boolean createCompositeProduct(ArrayList<BaseProduct> e, String title) {
+        CompositeProduct compositeProduct = new CompositeProduct(title);
+        for(BaseProduct i : e)
+            compositeProduct.add(i);
+        menuItems.add(compositeProduct);
 
+        return true;
     }
 
     public boolean verifyLogIn(String role, String username, String password)

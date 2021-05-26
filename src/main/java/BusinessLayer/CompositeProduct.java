@@ -5,7 +5,15 @@ import java.util.ArrayList;
 
 public class CompositeProduct implements MenuItem {
 
-    ArrayList<MenuItem> products = new ArrayList<>();
+    ArrayList<BaseProduct> products = new ArrayList<>();
+    private String title;
+    private int id;
+
+    public CompositeProduct(String title)
+    {
+        this.title=title;
+    }
+
     @Override
     public int computePrice() {
         int sum=0;
@@ -14,8 +22,77 @@ public class CompositeProduct implements MenuItem {
         return sum;
     }
 
-    public void add(MenuItem menuItem)
+    public ArrayList<BaseProduct> getProducts() {
+        return products;
+    }
+
+    public void setProducts(ArrayList<BaseProduct> products) {
+        this.products = products;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void add(BaseProduct menuItem)
     {
         products.add(menuItem);
+        title += " "+menuItem.getTitle();
+    }
+
+    public float getRating()
+    {
+        float rating = 0;
+        for(BaseProduct i : products)
+            rating+= i.getRating();
+        rating/=products.size();
+        return rating;
+    }
+
+    public int getCalories()
+    {
+        int calories = 0;
+        for(BaseProduct i : products)
+            calories+= i.getCalories();
+        return calories;
+    }
+
+    public int getProtein()
+    {
+        int protein = 0;
+        for(BaseProduct i : products)
+            protein+= i.getProtein();
+        return protein;
+    }
+
+    public int getFat()
+    {
+        int fat = 0;
+        for(BaseProduct i : products)
+            fat+= i.getFat();
+        return fat;
+    }
+
+    public int getSodium()
+    {
+        int sodium = 0;
+        for(BaseProduct i : products)
+            sodium+= i.getSodium();
+        return sodium;
+    }
+    public int getPrice()
+    {
+        int price = 0;
+        for(BaseProduct i : products)
+            price+= i.getPrice();
+        return price;
     }
 }

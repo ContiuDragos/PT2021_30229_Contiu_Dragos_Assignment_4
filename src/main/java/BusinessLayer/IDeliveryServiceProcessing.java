@@ -1,14 +1,17 @@
 package BusinessLayer;
 
+import java.util.ArrayList;
+
 public interface IDeliveryServiceProcessing {
 
     void importProducts();
 
-    void addProduct();
+    boolean addProduct(String title, float rating, int calories, int protein, int fat, int sodium, int price);
 
-    void deleteProduct();
+    boolean deleteProduct(String title);
 
-    void modifyProduct();
+    boolean modifyProduct(String title, float rating, int calories, int protein, int fat, int sodium, int price);
 
-    void generateReport();
+    boolean createCompositeProduct(ArrayList<BaseProduct> e, String title);
+
 }

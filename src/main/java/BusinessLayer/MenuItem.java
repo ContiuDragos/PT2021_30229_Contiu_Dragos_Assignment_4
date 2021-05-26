@@ -1,5 +1,6 @@
 package BusinessLayer;
 
 public interface MenuItem {
-    public int computePrice();
+    int computePrice();
+    String getTitle();
 }
