@@ -2,10 +2,10 @@ package BusinessLayer;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Bill {
+public class Bill implements Serializable {
     private ArrayList<MenuItem> products;
     private Order order;
     private FileWriter myWriter;

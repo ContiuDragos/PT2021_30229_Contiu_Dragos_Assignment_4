@@ -1,6 +1,8 @@
 package BusinessLayer;
 
-public class BaseProduct implements MenuItem{
+import java.io.Serializable;
+
+public class BaseProduct implements MenuItem, Serializable {
     private int id;
     private final String title;
     private float rating;

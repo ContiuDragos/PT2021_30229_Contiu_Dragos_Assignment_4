@@ -10,8 +10,8 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class ClientController {
-    private ClientGUI clientGUI;
-    private DeliveryService deliveryService;
+    private final ClientGUI clientGUI;
+    private final DeliveryService deliveryService;
     private int counter;
 
     public ClientController(ClientGUI clientGUI, DeliveryService deliveryService)
@@ -139,7 +139,7 @@ public class ClientController {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             clientGUI.frame.dispose();
-            new MainController(new MainGUI(),deliveryService);
+            ///new MainController(new MainGUI(),deliveryService);
         }
     }
 }

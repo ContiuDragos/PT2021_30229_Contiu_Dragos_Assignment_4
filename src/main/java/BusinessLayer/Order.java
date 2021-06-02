@@ -1,8 +1,9 @@
 package BusinessLayer;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Order {
+public class Order implements Serializable {
     private final int orderID;
     private final int clientID;
     private final Date date;

@@ -1,9 +1,10 @@
 package BusinessLayer;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class CompositeProduct implements MenuItem {
+public class CompositeProduct implements MenuItem, Serializable {
 
     ArrayList<BaseProduct> products = new ArrayList<>();
     private String title;

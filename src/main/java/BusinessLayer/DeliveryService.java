@@ -7,11 +7,12 @@ import Model.Worker;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DeliveryService implements IDeliveryServiceProcessing{
+public class DeliveryService extends Observable implements IDeliveryServiceProcessing, Serializable{
 
     private HashMap<Order, ArrayList<MenuItem>> orders = new HashMap();
     private ArrayList<MenuItem> menuItems = new ArrayList<>();
@@ -27,6 +28,7 @@ public class DeliveryService implements IDeliveryServiceProcessing{
     private int activeClient;
     private Order order;
     private Set<String> set = new HashSet<>();
+    public final Serializator serializator = new Serializator();
 
 
     @Override
@@ -53,6 +55,7 @@ public class DeliveryService implements IDeliveryServiceProcessing{
 
     @Override
     public boolean addProduct(String title, float rating, int calories, int protein, int fat, int sodium, int price) {
+        assert title.equals("") : "To add a product, you have to give the name";
         if(set.add(title))
         {
             menuItems.add(new BaseProduct(++nrProducts,title,rating,calories,protein,fat,sodium,price));
@@ -63,6 +66,8 @@ public class DeliveryService implements IDeliveryServiceProcessing{
 
     @Override
     public boolean deleteProduct(String title) {
+
+        assert title.equals("") : "To delete a product, you have to give the name";
         if(!set.contains(title)) {
             return false;
         }
@@ -83,12 +88,15 @@ public class DeliveryService implements IDeliveryServiceProcessing{
                 }
             }
         }
+
+        assert removed : "The item could not be deleted";
         return true;
     }
 
     @Override
     public boolean modifyProduct(String title, float rating, int calories, int protein, int fat, int sodium, int price) {
 
+        assert title.equals("") : "To modify a product, you have to give the name";
         if(!set.contains(title))
             return false;
         for(MenuItem i : menuItems)
@@ -112,10 +120,15 @@ public class DeliveryService implements IDeliveryServiceProcessing{
 
     @Override
     public void createCompositeProduct(ArrayList<BaseProduct> e, String title) {
+        assert e.size()==0 : "A composite product must have at least one element";
+        assert title.equals("") : "A composite product must have a name";
+
         CompositeProduct compositeProduct = new CompositeProduct(title,++nrProducts);
         for(BaseProduct i : e)
             compositeProduct.add(i);
         menuItems.add(compositeProduct);
+
+        assert menuItems.contains(compositeProduct) : "The product could not be added to the menu";
     }
 
     @Override
@@ -157,12 +170,24 @@ public class DeliveryService implements IDeliveryServiceProcessing{
     @Override
     public void addOrder() {
         ArrayList<MenuItem> finalItemsInOrder = new ArrayList<>(itemsInOrder);
+        assert order.getClientID() <= 0 : "An order must have a valid client";
+        assert finalItemsInOrder.size() == 0 : "An order must have at least one product";
+
+        String text = "";
         for(MenuItem i : itemsInOrder) {
             i.setTimesOrdered(i.getTimesOrdered() + 1);
             order.setTotal(order.getTotal()+i.getPrice());
+            text = text + i.getTitle()+" ";
         }
+
         orders.put(order,finalItemsInOrder);
+        setChanged();
+        notifyObservers("OrderId = "+order.getOrderID()+" contains "+text);
         itemsInOrder.clear();
+
+        assert order.getTotal() < 0 : "The order must cost at least 1 Euro";
+        assert order.getClientID() <= 0 : "An order must have a valid client";
+        assert orders.get(order).size() <= 0 : "An order must have at least an item";
 
         clients.get(order.getClientID()-1).setNrOrders(clients.get(order.getClientID()-1).getNrOrders()+1);
         new Bill(finalItemsInOrder,order);
@@ -262,5 +287,16 @@ public class DeliveryService implements IDeliveryServiceProcessing{
 
     public ArrayList<MenuItem> getMenuItems() {
         return menuItems;
+    }
+
+    public Boolean wellFormed()
+    {
+        for(MenuItem i : menuItems)
+            if(i.getPrice() < 0 || i.getCalories() <0 || i.getProtein() <0 || i.getSodium() <0 || i.getFat() < 0 || i.getRating() <0)
+                return false;
+        for(Order i : orders.keySet())
+            if(i.getTotal()<0 || i.getOrderID() <0)
+                return false;
+        return true;
     }
 }

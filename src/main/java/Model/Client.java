@@ -1,6 +1,8 @@
 package Model;
 
-public class Client extends User{
+import java.io.Serializable;
+
+public class Client extends User implements Serializable {
 
     private int nrOrders;
     public Client(int id,String username, String password)

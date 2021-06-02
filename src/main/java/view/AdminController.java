@@ -57,7 +57,7 @@ public class AdminController {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             adminGUI.frame.dispose();
-            new MainController(new MainGUI(),deliveryService);
+            ///new MainController(new MainGUI(),deliveryService);
         }
     }
 
